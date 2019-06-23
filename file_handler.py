@@ -81,8 +81,7 @@ class FileHandler:
         if path.isfile(self.fpath) is True:
             if len(path.splitext(file_name)) != 0:
                 return True
-            else:
-                return False
+            return False
         return None
 
     def get_extension(self, filename=False):
