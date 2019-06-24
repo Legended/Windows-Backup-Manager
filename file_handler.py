@@ -66,7 +66,7 @@ class FileHandler:
             remove(self.file_path + '\\Backups\\' + sorted_backup_files[0][0])
             del sorted_backup_files[0]
             if len(sorted_backup_files) == max_files:
-                return
+                break
 
     def date_stamp(self):
         """Adds date and time to backup file name."""
