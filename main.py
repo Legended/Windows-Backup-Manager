@@ -257,7 +257,6 @@ class BackupManager:
             self.listbox.insert(0, f"Backup file created: "
                                    f"{FileHandler(self.config.files()[self.profile_combo.get()]).backup_file()}")
             FileHandler(self.config.files()[self.profile_combo.get()]).delete_excess(int(self.num_spinbox.get()))
-
             count += (int(self.int_sp_var.get()) * 60) + 1
         self.countdown = root.after(1000, self.start, count - 1)
 
