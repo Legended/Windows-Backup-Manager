@@ -3,6 +3,7 @@ from _tkinter import TclError
 from tkinter import ttk, messagebox
 from os import path, startfile
 from datetime import timedelta
+from contextlib import suppress
 from _config import Config
 from file_handler import FileHandler
 
@@ -283,10 +284,8 @@ class BackupManager:
 if __name__ == '__main__':
     root = tk.Tk()
     root.title('Seize Backup Manager')
-    try:
+    with suppress(TclError):
         root.iconbitmap('save_icon.ico')
-    except TclError:
-        pass
 
     ws = root.winfo_screenwidth()
     hs = root.winfo_screenheight()
