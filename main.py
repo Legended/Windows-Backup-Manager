@@ -14,11 +14,12 @@ class BackupManager:
     countdown = None
 
     def __init__(self, master):
+        """Widgets"""
+
         # Quick Save/Load Hot Keys
         root.bind("<F5>", lambda event: self.quick_save())
         root.bind("<F6>", lambda event: self.quick_load())
 
-        # Widgets
         self.lf_auto_save = ttk.LabelFrame(master, text='Auto-Backup')
         self.lf_auto_save.grid(row=0, column=0, padx=5, pady=0, sticky='EW')
 
@@ -89,10 +90,11 @@ class BackupManager:
         self.timer.config(font='System')
         self.timer.grid(row=1, column=6, padx=5)
 
-        # Notebook for y
+        # Notebook for 'Data Log' and 'Edit Config' tabs.
         self.nb = ttk.Notebook(master)
         self.nb.grid(row=1, column=0, padx=5, pady=5, sticky='NSEW')
 
+        # Frame for 'Data Log' tab.
         self.nb_frame = tk.Frame(master)
         self.nb_frame.grid(row=0, column=0, padx=5, pady=5, sticky='NSEW')
         self.nb_frame.grid_rowconfigure(1, weight=1)
@@ -117,12 +119,17 @@ class BackupManager:
         self.delete_all_button = ttk.Button(self.lf_data_log, text='Delete All', command=self.delete_all)
         self.delete_all_button.grid(row=0, column=4, padx=5)
 
+        self.display_backups = ttk.Button(self.lf_data_log, text='Show Backups', command=self.show_backups)
+        self.display_backups.grid(row=0, column=5, padx=5)
+
         self.listbox = tk.Listbox(self.nb_frame, width=45, height=25, bg='black', fg='limegreen',
                                   selectbackground='purple')
         self.listbox.grid(row=1, column=0, padx=5, pady=5, sticky='NSEW')
 
+        # Main frame for 'Edit Config' tab.
         self.nb_frame2 = tk.Frame(master)
         self.nb_frame2.grid(row=0, column=0, padx=5, pady=5, sticky='NSEW')
+        self.nb_frame2.grid_columnconfigure(0, weight=1)
         self.nb.add(self.nb_frame2, text='Edit Config')
 
         self.lf_config = ttk.LabelFrame(self.nb_frame2, text='Add File')
@@ -213,10 +220,8 @@ class BackupManager:
 
     def clear_selected_listbox(self):
         """Clears selected item from 'listbox'."""
-        try:
+        with suppress(TclError):
             self.listbox.delete(self.listbox.curselection())
-        except TclError:
-            pass
 
     def clear_all_listbox(self):
         """Clears all items from 'listbox'."""
@@ -251,6 +256,14 @@ class BackupManager:
             FileHandler(self.config.files()[self.profile_combo.get()]).delete_all_backups()
             self.listbox.insert(0, 'All Backup Files Deleted')
 
+    def show_backups(self):
+        """Displays backup files to the listbox."""
+        try:
+            for backup_files in FileHandler(self.config.files()[self.profile_combo.get()]).backup_files:
+                self.listbox.insert(0, backup_files)
+        except OSError:
+            self.listbox.insert(0, 'Directory does not exist.')
+
     def start(self, count):
         """"Initiate Auto-Backup."""
         self.timer_var.set(timedelta(seconds=count))
@@ -258,15 +271,14 @@ class BackupManager:
             self.listbox.insert(0, f"Backup file created: "
                                    f"{FileHandler(self.config.files()[self.profile_combo.get()]).backup_file()}")
             FileHandler(self.config.files()[self.profile_combo.get()]).delete_excess(int(self.num_spinbox.get()))
+
             count += (int(self.int_sp_var.get()) * 60) + 1
         self.countdown = root.after(1000, self.start, count - 1)
 
     def stop(self):
         """"Stop Auto-Backup and reset states and variables."""
-        try:
+        with suppress(ValueError):
             root.after_cancel(self.countdown)
-        except ValueError:
-            pass
         self.start_autosave.state(['!disabled'])
         self.stop_autosave.state(['disabled'])
         self.timer_var.set(timedelta(seconds=0))
@@ -285,17 +297,19 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title('Seize Backup Manager')
     with suppress(TclError):
-        root.iconbitmap('save_icon.ico')
-
-    ws = root.winfo_screenwidth()
-    hs = root.winfo_screenheight()
-    x = (ws / 2) - (579 / 2)
-    y = (hs / 2) - (499 / 2)
-    root.geometry('+%d+%d' % (x, y))
+        root.iconbitmap('icon/save_icon.ico')
 
     root.configure(padx=2.5, pady=2.5)
     root.grid_columnconfigure(0, weight=1)
     root.grid_rowconfigure(1, weight=1)
 
     BackupManager(root).last_session()
+
+    root.update()
+    sw = root.winfo_screenwidth() / 2
+    sh = root.winfo_screenheight() / 2
+    w = root.winfo_width() / 2
+    h = root.winfo_height() / 2
+    root.geometry('+%d+%d' % (sw - w, sh - h))
+
     root.mainloop()
