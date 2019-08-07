@@ -19,7 +19,7 @@ class Config:
     _config = ConfigParser()
     _config.optionxform = str
     documents_dir = getenv('USERPROFILE') + '\\Documents'   # C:/Users/<User_Name>/Documents
-    bm_dir = documents_dir + '\\Seize Backup Manager'   # C:/Users/<User_Name>/Documents/Seize Backup Manager
+    bm_dir = documents_dir + '\\Backup Manager'   # C:/Users/<User_Name>/Documents/Seize Backup Manager
     config_dir = bm_dir + '\\config.ini'    # C:/Users/<User_Name>/Documents/Seize Backup Manager/config.ini
 
     def __init__(self):
@@ -45,18 +45,19 @@ class Config:
     def create_config(self):
         """Creates 'config.ini' file in 'Seize Backup Manager' folder at C:/Users/<User_Name>/Documents.
         Return 'None' If folder and file already exist."""
-        if path.isfile(self.config_dir) is not True:
-            if path.isdir(self.bm_dir) is False:
-                mkdir(self.bm_dir)
-            if path.isfile(self.config_dir) is False:
-                self._config['Last Session'] = {'Last Profile': '',
-                                                'Auto-Save Interval': 5,
-                                                'Number of Backups': 15}
-                self._config['Files'] = {}
+        if path.isfile(self.config_dir) is True:
+            return
+        if path.isdir(self.bm_dir) is False:
+            mkdir(self.bm_dir)
+        if path.isfile(self.config_dir) is False:
+            self._config['Last Session'] = {'Last Profile': '',
+                                            'Auto-Save Interval': 5,
+                                            'Number of Backups': 15}
+            self._config['Files'] = {}
 
-                with open(self.config_dir, 'w') as create_config:
-                    self._config.write(create_config)
-                    create_config.close()
+            with open(self.config_dir, 'w') as create_config:
+                self._config.write(create_config)
+                create_config.close()
 
     def update_config(self, profile, interval, backups):
         """Update 'config.ini' with 'Select Profile', 'Interval in Min(s)' and '# of Backups' from 'BackupManager.py."""
