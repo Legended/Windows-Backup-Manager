@@ -61,12 +61,13 @@ class FileHandler:
             return
         dir_epoch = [stat(self.file_path + '\\Backups\\' + backup_file).st_mtime for backup_file in self.backup_files]
         sorted_backup_files = list(sorted(zip(self.backup_files, dir_epoch), key=lambda x: x[1]))
+
         # Deletes oldest files if they exceed the number passed within the 'maximum' parameter.
         while len(sorted_backup_files) > max_files:
             remove(self.file_path + '\\Backups\\' + sorted_backup_files[0][0])
             del sorted_backup_files[0]
             if len(sorted_backup_files) == max_files:
-                break
+                return
 
     def date_stamp(self):
         """Adds date and time to backup file name."""
