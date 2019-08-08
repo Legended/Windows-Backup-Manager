@@ -168,7 +168,8 @@ class BackupManager:
         self.add_file_label.grid(row=0, column=0, padx=5, pady=5)
 
         # Entry box for 'File Name'.
-        self.add_file_entry = ttk.Entry(self.lf_config)
+        self.add_file_entry_var = tk.StringVar()
+        self.add_file_entry = ttk.Entry(self.lf_config, textvariable=self.add_file_entry_var)
         self.add_file_entry.grid(row=0, column=1)
 
         # Label for 'Path' entry box.
@@ -236,6 +237,8 @@ class BackupManager:
         file = filedialog.askopenfile(initialdir='c:/', title='Select File')
         with suppress(AttributeError):
             self.path_entry_var.set(file.name)
+            if len(self.add_file_entry.get()) == 0:
+                self.add_file_entry_var.set(file.name.rsplit('/', 1)[1])
 
     def add_config(self):
         """Adds a custom file to 'config.ini'."""
