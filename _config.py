@@ -36,7 +36,7 @@ class Config:
             self.filesValues = [self._config[self._config.sections()[1]][keys]
                                 for keys in self._config[self._config.sections()[1]]]
 
-            # Set config
+            # Checks if 'Last Profile' from [Last Session] is in [Files] keys. If not, sets 'Last Profile' to empty.
             if self.lastSessionValues[0] not in self.filesKeys:
                 self._config.set(self._config.sections()[0], self.lastSessionKeys[0], '')
                 with open(self.config_dir, 'w') as update_config:
