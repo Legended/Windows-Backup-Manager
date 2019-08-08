@@ -25,14 +25,23 @@ class Config:
     def __init__(self):
         try:
             self._config.read(self.config_dir)
+
             # Keys and values for section [Last Session] in 'config.ini'.
             self.lastSessionKeys = [keys for keys in self._config[self._config.sections()[0]]]
             self.lastSessionValues = [self._config[self._config.sections()[0]][keys]
                                       for keys in self._config[self._config.sections()[0]]]
+
             # Keys and values for section [Files] in 'config.ini'. This section is used for custom files.
             self.filesKeys = [keys for keys in self._config[self._config.sections()[1]]]
             self.filesValues = [self._config[self._config.sections()[1]][keys]
                                 for keys in self._config[self._config.sections()[1]]]
+
+            # Set config
+            if self.lastSessionValues[0] not in self.filesKeys:
+                self._config.set(self._config.sections()[0], self.lastSessionKeys[0], '')
+                with open(self.config_dir, 'w') as update_config:
+                    self._config.write(update_config)
+
         except IndexError:
             # __init__() objects are created after 'config.ini' is created.
             self.create_config()
@@ -66,14 +75,14 @@ class Config:
         self._config.set(self._config.sections()[0], self.lastSessionKeys[2], backups)
         with open(self.config_dir, 'w') as update_config:
             self._config.write(update_config)
-            update_config.close()
+        self.__init__()
 
     def add_file(self, file, fpath):
         """Creates a new property and value for section '[Files]' in 'config.ini'."""
         self._config.set(self._config.sections()[1], file, fpath)
         with open(self.config_dir, 'w') as add_config:
             self._config.write(add_config)
-            add_config.close()
+        self.__init__()
 
     def remove_file(self,  option):
         """Removes a property and value for section '[Files]' in 'config.ini'"""
@@ -81,3 +90,4 @@ class Config:
         with open(self.config_dir, 'w') as delete_option:
             self._config.write(delete_option)
             delete_option.close()
+        self.__init__()
