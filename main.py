@@ -223,9 +223,8 @@ class BackupManager:
 
     def last_session(self):
         """Sets queries for 'Select Profile', 'Directory', 'Interval in Min(s)', and '# of Backups'."""
-        self.profile_combo.set(self.config.lastSessionValues[0])
-        self.int_sp_var.set(self.config.lastSessionValues[1])
-        self.num_sp_var.set(self.config.lastSessionValues[2])
+        for i, attr in (self.profile_combo, self.int_sp_var, self.num_sp_var):
+            attr.set(self.config.lastSessionValues[i])
 
         if self.profile_combo.get() in self.config.filesKeys:
             self.dir_entry_var.set(path.split(self.config.files()[self.profile_combo.get()])[0])
